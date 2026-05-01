@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloverMC — Under Maintenance</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cyan: { 400: '#00d4ff', 500: '#00a8cc', 950: '#001217' },
+        gold: { 400: '#fbb034', 500: '#e6991a' },
+        void: '#050505',
+      },
+      fontFamily: {
+        orbitron: ['Orbitron', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050505;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.glass{
+  background:rgba(10,10,15,0.7);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(0,212,255,0.1);
+}
+.glow-cyan{text-shadow:0 0 30px rgba(0,212,255,0.4)}
+.glow-gold{text-shadow:0 0 25px rgba(251,176,52,0.35)}
+.btn-cyan{
+  background:linear-gradient(135deg,#00d4ff,#00a8cc);
+  color:#001217;
+  font-weight:800;
+  letter-spacing:0.08em;
+  transition:all 0.25s ease;
+  box-shadow:0 0 20px rgba(0,212,255,0.25);
+}
+.btn-cyan:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 40px rgba(0,212,255,0.4);
+}
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+.animate-spin-slow{animation:spin 8s linear infinite}
+@keyframes pulse-glow{
+  0%,100%{box-shadow:0 0 20px rgba(0,212,255,0.2)}
+  50%{box-shadow:0 0 40px rgba(0,212,255,0.4)}
+}
+.pulse-glow{animation:pulse-glow 3s ease-in-out infinite}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="max-w-lg mx-auto px-6 text-center">
+  <div class="mb-8">
+    <img src="assets/CloverMC_lg.png" alt="CloverMC" class="h-16 w-auto mx-auto mb-4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="hidden w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-gold-400 items-center justify-center mx-auto mb-4 font-orbitron font-black text-2xl text-void">C</div>
+    <h1 class="font-orbitron font-black text-2xl tracking-widest">CLOVER<span class="text-cyan-400">MC</span></h1>
+  </div>
+  <div class="glass rounded-3xl p-8 sm:p-10 mb-8 pulse-glow">
+    <div class="w-20 h-20 rounded-full bg-cyan-500/10 flex items-center justify-center mx-auto mb-6 border border-cyan-500/20">
+      <i class="fas fa-cog text-cyan-400 text-3xl animate-spin-slow"></i>
+    </div>
+    <h2 class="font-orbitron font-black text-3xl sm:text-4xl text-white mb-3">
+      UNDER <span class="text-cyan-400 glow-cyan">MAINTENANCE</span>
+    </h2>
+    <p class="text-gray-400 mb-6 leading-relaxed">
+      We're currently working on something awesome. Both the Minecraft server and Discord community are temporarily offline while we upgrade our systems.
+    </p>
+    <div class="space-y-3 mb-8">
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-void/50">
+        <i class="fas fa-server text-cyan-400/60 w-5"></i>
+        <span class="text-gray-300 text-sm">Minecraft Server — <span class="text-gold-400 font-semibold">Offline</span></span>
+      </div>
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-void/50">
+        <i class="fab fa-discord text-indigo-400/60 w-5"></i>
+        <span class="text-gray-300 text-sm">Discord Server — <span class="text-gold-400 font-semibold">Offline</span></span>
+      </div>
+      <div class="flex items-center gap-3 p-3 rounded-lg bg-void/50">
+        <i class="fas fa-wrench text-cyan-400/60 w-5"></i>
+        <span class="text-gray-300 text-sm">System Upgrade — <span class="text-cyan-400 font-semibold">In Progress</span></span>
+      </div>
+    </div>
+    <div class="border-t border-cyan-900/20 pt-6">
+      <p class="text-gray-500 text-sm mb-4">Check back soon. The arena will return stronger than ever.</p>
+      <a href="index.html" class="btn-cyan inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm">
+        <i class="fas fa-arrow-left"></i>
+        BACK TO HOME
+      </a>
+    </div>
+  </div>
+  <p class="text-gray-700 text-xs font-mono">play.clovermc.org:25565 • v1.21.x</p>
+</div>
+<div style="position:fixed;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;z-index:-9999">made by abban ali</div>
+</body>
+</html>

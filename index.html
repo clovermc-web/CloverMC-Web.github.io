@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloverMC — FFA PvP Server</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cyan: { 400: '#00d4ff', 500: '#00a8cc', 950: '#001217' },
+        gold: { 400: '#fbb034', 500: '#e6991a', 950: '#0d0901' },
+        void: '#050505',
+        surface: '#0a0a0f',
+      },
+      fontFamily: {
+        orbitron: ['Orbitron', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#050505;color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden}
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    linear-gradient(180deg,transparent 0%,transparent 60%,#050505 100%),
+    radial-gradient(ellipse at 30% 20%,rgba(0,212,255,0.08) 0%,transparent 50%),
+    radial-gradient(ellipse at 70% 80%,rgba(251,176,52,0.05) 0%,transparent 50%),
+    #050505;
+  position:relative;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url('assets/CloverMC_bn.png') center/cover no-repeat;
+  opacity:0.25;
+}
+.hero>*{position:relative;z-index:2}
+.glow-cyan{text-shadow:0 0 30px rgba(0,212,255,0.4)}
+.glow-gold{text-shadow:0 0 25px rgba(251,176,52,0.35)}
+.glass{
+  background:rgba(10,10,15,0.7);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(0,212,255,0.1);
+}
+.btn-cyan{
+  background:linear-gradient(135deg,#00d4ff,#00a8cc);
+  color:#001217;
+  font-weight:800;
+  letter-spacing:0.08em;
+  transition:all 0.25s ease;
+  box-shadow:0 0 20px rgba(0,212,255,0.25);
+}
+.btn-cyan:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 40px rgba(0,212,255,0.4),0 8px 20px rgba(0,212,255,0.15);
+}
+.tab{
+  padding:12px 28px;
+  border-radius:10px;
+  font-family:'Orbitron',sans-serif;
+  font-weight:700;
+  font-size:0.85rem;
+  letter-spacing:0.05em;
+  color:#666;
+  border:1px solid transparent;
+  transition:all 0.3s ease;
+  cursor:pointer;
+  background:transparent;
+}
+.tab.active{
+  background:rgba(0,212,255,0.08);
+  border-color:rgba(0,212,255,0.3);
+  color:#00d4ff;
+  box-shadow:0 0 20px rgba(0,212,255,0.08);
+}
+.tab:hover:not(.active){color:#999}
+.rule{
+  padding:14px 18px;
+  border-radius:10px;
+  border-left:2px solid rgba(0,212,255,0.1);
+  background:rgba(255,255,255,0.02);
+  transition:all 0.2s ease;
+}
+.rule:hover{
+  border-left-color:#00d4ff;
+  background:rgba(0,212,255,0.03);
+  transform:translateX(3px);
+}
+.rule-gold{border-left-color:rgba(251,176,52,0.1)}
+.rule-gold:hover{border-left-color:#fbb034;background:rgba(251,176,52,0.03)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#050505}
+::-webkit-scrollbar-thumb{background:#1a1a2e;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#00a8cc}
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:100;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes pulse{
+  0%,100%{opacity:1}
+  50%{opacity:0.5}
+}
+.animate-fadeUp{animation:fadeUp 0.8s ease forwards}
+.animate-fadeIn{animation:fadeIn 1s ease forwards}
+.animate-pulse-slow{animation:pulse 2.5s ease-in-out infinite}
+.delay-1{animation-delay:0.15s;opacity:0}
+.delay-2{animation-delay:0.3s;opacity:0}
+.delay-3{animation-delay:0.45s;opacity:0}
+.delay-4{animation-delay:0.6s;opacity:0}
+.grid-bg{
+  background-image:linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+<nav id="nav" class="fixed top-0 w-full z-50 transition-all duration-300">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <img src="assets/CloverMC_lg.png" alt="" class="h-9 w-auto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="hidden w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-gold-400 items-center justify-center font-orbitron font-black text-sm text-void">C</div>
+      <span class="font-orbitron font-black text-lg tracking-widest">CLOVER<span class="text-cyan-400">MC</span></span>
+    </a>
+    <div class="hidden md:flex items-center gap-1">
+      <a href="#join" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-cyan-400 transition-colors">Join</a>
+      <a href="#play" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-cyan-400 transition-colors">How to Play</a>
+      <a href="#rules" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-cyan-400 transition-colors">Rules</a>
+      <a href="#community" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-cyan-400 transition-colors">Community</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="hidden sm:flex items-center gap-2 text-xs text-cyan-400/70 font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse-slow"></span>
+        <span id="players">127 ONLINE</span>
+      </span>
+      <a href="#join" class="btn-cyan px-5 py-2 rounded-lg text-xs">PLAY NOW</a>
+    </div>
+  </div>
+</nav>
+<section id="join" class="hero">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <div class="animate-fadeIn">
+      <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-cyan-400 text-xs font-semibold tracking-wider mb-8">
+        <i class="fas fa-bolt text-gold-400"></i>
+        v1.21.x • FFA PVP • JAVA & BEDROCK
+      </span>
+    </div>
+    <h1 class="font-orbitron font-black text-5xl sm:text-7xl md:text-8xl text-white mb-6 leading-none animate-fadeUp delay-1">
+      DOMINATE<br>
+      <span class="text-cyan-400 glow-cyan">THE ARENA</span>
+    </h1>
+    <p class="text-gray-400 text-lg max-w-xl mx-auto mb-10 animate-fadeUp delay-2">
+      Pure Free-For-All chaos. No factions. No alliances. Just you and the battlefield.
+    </p>
+    <div class="glass rounded-2xl p-6 sm:p-8 max-w-xl mx-auto mb-10 animate-fadeUp delay-3">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-left">
+          <p class="text-gray-500 text-xs font-semibold tracking-widest uppercase mb-1">Server Address</p>
+          <p class="font-orbitron font-bold text-2xl sm:text-3xl text-white tracking-wider">play.clovermc.org</p>
+        </div>
+        <button onclick="copyIP()" class="btn-cyan px-6 py-3 rounded-xl text-sm flex items-center gap-2 flex-shrink-0">
+          <i class="fas fa-copy"></i>
+          <span id="copyText">COPY IP</span>
+        </button>
+      </div>
+      <div class="mt-5 pt-5 border-t border-cyan-900/10 flex items-center justify-center gap-8 text-sm">
+        <span class="text-gray-500">Port <span class="text-cyan-400 font-mono font-bold ml-1">25565</span></span>
+        <span class="text-gray-700">|</span>
+        <span class="text-gray-500">Version <span class="text-cyan-400 font-mono font-bold ml-1">1.21.x</span></span>
+        <span class="text-gray-700">|</span>
+        <span class="text-gray-500">Mode <span class="text-gold-400 font-mono font-bold ml-1">FFA</span></span>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto animate-fadeUp delay-4">
+      <div class="glass rounded-xl p-4 text-center">
+        <p class="font-orbitron font-bold text-2xl text-cyan-400">FFA</p>
+        <p class="text-gray-600 text-xs mt-1 uppercase tracking-wider">PvP Mode</p>
+      </div>
+      <div class="glass rounded-xl p-4 text-center">
+        <p class="font-orbitron font-bold text-2xl text-cyan-400">24/7</p>
+        <p class="text-gray-600 text-xs mt-1 uppercase tracking-wider">Uptime</p>
+      </div>
+      <div class="glass rounded-xl p-4 text-center">
+        <p class="font-orbitron font-bold text-2xl text-cyan-400">&lt;30ms</p>
+        <p class="text-gray-600 text-xs mt-1 uppercase tracking-wider">Latency</p>
+      </div>
+      <div class="glass rounded-xl p-4 text-center">
+        <p class="font-orbitron font-bold text-2xl text-gold-400">AC</p>
+        <p class="text-gray-600 text-xs mt-1 uppercase tracking-wider">Protected</p>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+    <i class="fas fa-chevron-down text-cyan-400/40 text-sm"></i>
+  </div>
+</section>
+<section id="play" class="py-24 relative">
+  <div class="absolute inset-0 grid-bg"></div>
+  <div class="max-w-4xl mx-auto px-6 relative">
+    <div class="text-center mb-12">
+      <h2 class="font-orbitron font-black text-4xl sm:text-5xl text-white mb-3">HOW TO <span class="text-cyan-400 glow-cyan">JOIN</span></h2>
+      <p class="text-gray-500">Pick your platform. Connect in seconds.</p>
+    </div>
+    <div class="flex justify-center mb-8">
+      <div class="glass rounded-xl p-1.5 flex gap-1">
+        <button onclick="switchTab('java')" id="tab-java" class="tab active"><i class="fas fa-coffee mr-2"></i>JAVA</button>
+        <button onclick="switchTab('bedrock')" id="tab-bedrock" class="tab"><i class="fas fa-cube mr-2"></i>BEDROCK</button>
+      </div>
+    </div>
+    <div id="content-java" class="glass rounded-2xl p-6 sm:p-10">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center">
+          <i class="fas fa-coffee text-white"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-xl text-white">Java Edition</h3>
+          <p class="text-gray-500 text-sm">PC / Mac / Linux</p>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">1</span>
+          <div><p class="text-white font-medium">Launch Minecraft Java Edition</p><p class="text-gray-500 text-sm mt-0.5">Version 1.21.x or compatible</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">2</span>
+          <div><p class="text-white font-medium">Click "Multiplayer"</p><p class="text-gray-500 text-sm mt-0.5">From the main menu</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">3</span>
+          <div><p class="text-white font-medium">Click "Add Server"</p><p class="text-gray-500 text-sm mt-0.5">Or use "Direct Connection"</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">4</span>
+          <div>
+            <p class="text-white font-medium">Enter Server Address</p>
+            <div class="flex items-center gap-2 mt-2">
+              <code class="px-3 py-1.5 rounded-lg bg-void border border-cyan-800/20 text-cyan-400 font-mono text-sm font-bold">play.clovermc.org</code>
+              <button onclick="copyIP()" class="text-cyan-500 hover:text-cyan-300"><i class="fas fa-copy"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">5</span>
+          <div><p class="text-white font-medium">Click "Done" and Join</p><p class="text-gray-500 text-sm mt-0.5">Select server and click "Join Server"</p></div>
+        </div>
+      </div>
+    </div>
+    <div id="content-bedrock" class="hidden glass rounded-2xl p-6 sm:p-10">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-500 to-gray-700 flex items-center justify-center">
+          <i class="fas fa-cube text-white"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-xl text-white">Bedrock Edition</h3>
+          <p class="text-gray-500 text-sm">Console / Mobile / Win10</p>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">1</span>
+          <div><p class="text-white font-medium">Launch Minecraft Bedrock</p><p class="text-gray-500 text-sm mt-0.5">On your device</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">2</span>
+          <div><p class="text-white font-medium">Click "Play" then "Servers"</p><p class="text-gray-500 text-sm mt-0.5">Navigate to the Servers tab</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">3</span>
+          <div><p class="text-white font-medium">Scroll Down & Click "Add Server"</p><p class="text-gray-500 text-sm mt-0.5">At the bottom of the list</p></div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">4</span>
+          <div>
+            <p class="text-white font-medium">Enter Server Details</p>
+            <div class="grid sm:grid-cols-3 gap-2 mt-2">
+              <div class="glass rounded-lg p-2 text-center"><p class="text-gray-500 text-xs">Name</p><p class="text-cyan-400 font-mono font-bold text-sm">CloverMC</p></div>
+              <div class="glass rounded-lg p-2 text-center"><p class="text-gray-500 text-xs">Address</p><p class="text-cyan-400 font-mono font-bold text-sm">play.clovermc.org</p></div>
+              <div class="glass rounded-lg p-2 text-center"><p class="text-gray-500 text-xs">Port</p><p class="text-gold-400 font-mono font-bold text-sm">25565</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-void/50">
+          <span class="font-orbitron font-bold text-cyan-400 text-lg w-6">5</span>
+          <div><p class="text-white font-medium">Click "Save" and Join</p><p class="text-gray-500 text-sm mt-0.5">Tap the server and select "Join Server"</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="rules" class="py-24 relative">
+  <div class="absolute inset-0 grid-bg opacity-50"></div>
+  <div class="max-w-5xl mx-auto px-6 relative">
+    <div class="text-center mb-12">
+      <h2 class="font-orbitron font-black text-4xl sm:text-5xl text-white mb-3">SERVER <span class="text-gold-400 glow-gold">RULES</span></h2>
+      <p class="text-gray-500">Break them. Face the hammer.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <i class="fab fa-discord text-indigo-400 text-xl"></i>
+          <h3 class="font-orbitron font-bold text-lg text-white">Discord Rules</h3>
+        </div>
+        <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">1.</span>No spamming or flooding chat.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">2.</span>No swearing. Don't bypass filters.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">3.</span>No discrimination or hate speech.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">4.</span>No threats, harassment, or abuse.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">5.</span>No 18+ or NSFW content.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">6.</span>No political or sensitive topics.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">7.</span>No drama or toxicity.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">8.</span>No advertising (unless partnered).</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">9.</span>Don't impersonate staff.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">10.</span>Don't discuss punishments publicly.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">11.</span>Don't encourage rule-breaking.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">12.</span>No DDoS or dox threats.</p></div>
+          <div class="rule"><p class="text-gray-300 text-sm"><span class="text-cyan-400 font-bold mr-2">13.</span>Follow Discord's Terms of Service.</p></div>
+        </div>
+      </div>
+      <div class="glass rounded-2xl p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <i class="fas fa-cube text-cyan-400 text-xl"></i>
+          <h3 class="font-orbitron font-bold text-lg text-white">Minecraft Rules</h3>
+        </div>
+        <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">1.</span>No hacked clients or AutoClickers.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">2.</span>No abusing exploits. Report them.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">3.</span>No inappropriate usernames or skins.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">4.</span>No glitching to escape PvP.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">5.</span>No alt account farming. Max 3 alts.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">6.</span>No duping exploits or lag machines.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">7.</span>No IRL trading.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">8.</span>No evading punishments.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">9.</span>Max 3 accounts online at once.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">10.</span>No loopholes or workarounds.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">11.</span>No swearing in-game. All ages.</p></div>
+          <div class="rule rule-gold"><p class="text-gray-300 text-sm"><span class="text-gold-400 font-bold mr-2">12.</span>No NSFW content anywhere.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6 glass rounded-xl p-5 text-center">
+      <p class="text-gray-500 text-sm">Rules change without notice. <span class="text-white">Not knowing them is not an excuse.</span></p>
+    </div>
+  </div>
+</section>
+<section id="community" class="py-24 relative">
+  <div class="absolute inset-0 grid-bg"></div>
+  <div class="max-w-3xl mx-auto px-6 relative">
+    <div class="text-center mb-12">
+      <h2 class="font-orbitron font-black text-4xl sm:text-5xl text-white mb-3">JOIN THE <span class="text-cyan-400 glow-cyan">HORDE</span></h2>
+      <p class="text-gray-500">Connect. Strategize. Dominate.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 max-w-xl mx-auto">
+      <a href="wip.html" class="glass rounded-2xl p-8 hover:border-cyan-500/30 transition-all group text-center">
+        <i class="fab fa-discord text-indigo-400 text-3xl mb-4 group-hover:scale-110 transition-transform inline-block"></i>
+        <h3 class="font-orbitron font-bold text-white mb-2">Discord</h3>
+        <p class="text-gray-500 text-sm">Chat, reports, appeals, updates</p>
+      </a>
+      <a href="wip.html" class="glass rounded-2xl p-8 hover:border-cyan-500/30 transition-all group text-center">
+        <i class="fas fa-ticket-alt text-cyan-400 text-3xl mb-4 group-hover:scale-110 transition-transform inline-block"></i>
+        <h3 class="font-orbitron font-bold text-white mb-2">Support</h3>
+        <p class="text-gray-500 text-sm">Open a ticket for staff help</p>
+      </a>
+    </div>
+  </div>
+</section>
+<footer class="py-10 border-t border-cyan-900/10">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <p class="text-gray-700 text-xs font-mono mb-2">play.clovermc.org:25565 • v1.21.x</p>
+    <p class="text-gray-800 text-xs">© 2026 CloverMC. Not affiliated with Mojang or Microsoft.</p>
+  </div>
+</footer>
+<div id="toast" class="toast glass px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-semibold">
+  <i class="fas fa-check text-cyan-400"></i>
+  <span id="toastMsg">IP copied!</span>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('nav');
+  nav.classList.toggle('glass',window.scrollY>50);
+  nav.classList.toggle('shadow-lg',window.scrollY>50);
+  nav.classList.toggle('shadow-cyan-900/10',window.scrollY>50);
+});
+function switchTab(p){
+  const jt=document.getElementById('tab-java'),bt=document.getElementById('tab-bedrock');
+  const jc=document.getElementById('content-java'),bc=document.getElementById('content-bedrock');
+  if(p==='java'){
+    jt.classList.add('active');bt.classList.remove('active');
+    jc.classList.remove('hidden');bc.classList.add('hidden');
+  }else{
+    bt.classList.add('active');jt.classList.remove('active');
+    bc.classList.remove('hidden');jc.classList.add('hidden');
+  }
+}
+function copyIP(){
+  navigator.clipboard.writeText('play.clovermc.org').then(()=>{
+    showToast('IP copied to clipboard!');
+    const t=document.getElementById('copyText');
+    const o=t.textContent;t.textContent='COPIED!';
+    setTimeout(()=>t.textContent=o,1500);
+  });
+}
+function showToast(m){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=m;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+setInterval(()=>{
+  document.getElementById('players').textContent=(Math.floor(Math.random()*100)+80)+' ONLINE';
+},30000);
+</script>
+<div style="position:fixed;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;z-index:-9999">made by abban ali</div>
+</body>
+</html>
