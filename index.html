@@ -429,9 +429,21 @@ function showToast(m){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
-setInterval(()=>{
-  document.getElementById('players').textContent=(Math.floor(Math.random()*100)+80)+' ONLINE';
-},30000);
+async function fetchPlayerCount(){
+  try{
+    const res=await fetch('https://api.mcsrvstat.us/3/play.clovermc.org',{headers:{'User-Agent':'CloverMC-Website/1.0'}});
+    const data=await res.json();
+    if(data.online&&data.players){
+      document.getElementById('players').textContent=data.players.online+' / '+data.players.max+' ONLINE';
+    }else{
+      document.getElementById('players').textContent='OFFLINE';
+    }
+  }catch(e){
+    document.getElementById('players').textContent='-- ONLINE';
+  }
+}
+fetchPlayerCount();
+setInterval(fetchPlayerCount,30000);
 </script>
 <div style="position:fixed;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;z-index:-9999">made by abban ali</div>
 </body>
